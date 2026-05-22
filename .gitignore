@@ -1,0 +1,10 @@
+backend/data/
+backend/target/
+frontend/dist/
+frontend/node_modules/
+frontend/.vite/
+v1/
+v2/
+*.log
+.env
+frontend/.env.local
