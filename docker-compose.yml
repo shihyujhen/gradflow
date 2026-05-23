@@ -44,7 +44,6 @@ services:
       APP_CORS_ALLOWED_ORIGIN: ${APP_CORS_ALLOWED_ORIGIN:-http://127.0.0.1:5180,http://localhost:5180}
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
-      SQL_INIT_MODE: always
     ports:
       - "8082:8080"
 
