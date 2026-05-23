@@ -1,16 +1,18 @@
 services:
   frontend:
+    restart: unless-stopped
     build:
       context: ./frontend
       args:
-        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://127.0.0.1:8082/api}
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://3.227.255.27:8082/api}
     container_name: gradflow-frontend
     depends_on:
       - backend
     ports:
-      - "127.0.0.1:5180:80"
+      - "5180:80"
 
   postgres:
+    restart: unless-stopped
     image: postgres:16-alpine
     container_name: gradflow-postgres
     environment:
@@ -18,7 +20,7 @@ services:
       POSTGRES_USER: gradflow
       POSTGRES_PASSWORD: gradflow
     ports:
-      - "127.0.0.1:55432:5432"
+      - "55432:5432"
     volumes:
       - gradflow-postgres-data:/var/lib/postgresql/data
     healthcheck:
@@ -28,6 +30,7 @@ services:
       retries: 10
 
   backend:
+    restart: unless-stopped
     build:
       context: ./backend
     container_name: gradflow-backend
@@ -40,10 +43,10 @@ services:
       DATABASE_PASSWORD: gradflow
       APP_CORS_ALLOWED_ORIGIN: ${APP_CORS_ALLOWED_ORIGIN:-http://127.0.0.1:5180,http://localhost:5180}
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
-      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.0-flash}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
       SQL_INIT_MODE: always
     ports:
-      - "127.0.0.1:8082:8080"
+      - "8082:8080"
 
 volumes:
   gradflow-postgres-data:
