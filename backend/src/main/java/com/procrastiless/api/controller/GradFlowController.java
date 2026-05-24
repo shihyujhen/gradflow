@@ -1,5 +1,11 @@
 package com.procrastiless.api.controller;
+import java.io.IOException;
 
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.procrastiless.api.service.S3Service;
 import com.procrastiless.api.dto.GradFlowDtos.*;
 import com.procrastiless.api.model.*;
 import com.procrastiless.api.service.GeminiLogParserService;
@@ -14,12 +20,14 @@ import java.util.List;
 @RequestMapping("/api/gradflow")
 @CrossOrigin(originPatterns = "${app.cors.allowed-origin}")
 public class GradFlowController {
+    private final S3Service s3Service;
     private final GradFlowService gradFlowService;
     private final GeminiLogParserService geminiLogParserService;
 
-    public GradFlowController(GradFlowService gradFlowService, GeminiLogParserService geminiLogParserService) {
+    public GradFlowController(GradFlowService gradFlowService, GeminiLogParserService geminiLogParserService, S3Service s3Service) {
         this.gradFlowService = gradFlowService;
         this.geminiLogParserService = geminiLogParserService;
+	this.s3Service = s3Service;
     }
 
     @GetMapping("/daily-logs")
@@ -181,6 +189,12 @@ public class GradFlowController {
     @PostMapping("/ai/parse-log")
     public AiLogParseResponse parseLog(@RequestBody AiLogParseRequest request) {
         return geminiLogParserService.parse(request);
+    }
+    @PostMapping("/upload")
+    public String uploadFile(@RequestParam("file") MultipartFile file)
+            throws IOException {
+
+        return s3Service.uploadFile(file);
     }
 
     private String userEmail(String email) {

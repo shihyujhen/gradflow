@@ -851,6 +851,7 @@ function AvatarEditor({ profileSettings, setProfileSettings, setMessage, onClose
   const [avatarDraft, setAvatarDraft] = useState(profileSettings.avatar);
   const [avatarZoom, setAvatarZoom] = useState(1);
   const [avatarContrast, setAvatarContrast] = useState(100);
+  const [avatarUploading, setAvatarUploading] = useState(false);
   const fileInputRef = useRef(null);
   const canvasRef = useRef(null);
 
@@ -863,31 +864,70 @@ function AvatarEditor({ profileSettings, setProfileSettings, setMessage, onClose
   }
 
   function saveAvatar() {
-    if (!avatarDraft) {
-      setProfileSettings({ ...profileSettings, avatar: '' });
-      setMessage('Avatar removed.');
-      onClose();
-      return;
-    }
-    const canvas = canvasRef.current;
-    const context = canvas.getContext('2d');
-    const image = new Image();
-    image.onload = () => {
-      const size = 256;
-      canvas.width = size;
-      canvas.height = size;
-      const sourceSize = Math.min(image.width, image.height) / avatarZoom;
-      const sx = (image.width - sourceSize) / 2;
-      const sy = (image.height - sourceSize) / 2;
-      context.clearRect(0, 0, size, size);
-      context.filter = `contrast(${avatarContrast}%)`;
-      context.drawImage(image, sx, sy, sourceSize, sourceSize, 0, 0, size, size);
-      setProfileSettings({ ...profileSettings, avatar: canvas.toDataURL('image/png') });
-      if (!deferMessage) setMessage('Avatar updated.');
-      onClose();
-    };
-    image.src = avatarDraft;
+  if (!avatarDraft) {
+    setProfileSettings({ ...profileSettings, avatar: '' });
+    setMessage('Avatar removed.');
+    onClose();
+    return;
   }
+
+  const canvas = canvasRef.current;
+  const context = canvas.getContext('2d');
+  const image = new Image();
+
+  image.onload = () => {
+    const size = 256;
+    canvas.width = size;
+    canvas.height = size;
+
+    const sourceSize = Math.min(image.width, image.height) / avatarZoom;
+    const sx = (image.width - sourceSize) / 2;
+    const sy = (image.height - sourceSize) / 2;
+
+    context.clearRect(0, 0, size, size);
+    context.filter = `contrast(${avatarContrast}%)`;
+    context.drawImage(image, sx, sy, sourceSize, sourceSize, 0, 0, size, size);
+
+    canvas.toBlob(async (blob) => {
+      if (!blob) {
+        setMessage('Avatar upload failed.');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('file', blob, `avatar-${Date.now()}.png`);
+
+      try {
+        setAvatarUploading(true);
+
+        const response = await fetch('/api/gradflow/upload', {
+          method: 'POST',
+          headers: {
+            'X-User-Email': 'demo@gradflow.local',
+          },
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error('Avatar upload failed.');
+        }
+
+        const s3Url = await response.text();
+
+        setProfileSettings({ ...profileSettings, avatar: s3Url });
+        if (!deferMessage) setMessage('Avatar uploaded to S3.');
+        onClose();
+      } catch (error) {
+        console.error('Avatar upload failed:', error);
+        setMessage('Avatar upload failed.');
+      } finally {
+        setAvatarUploading(false);
+      }
+    }, 'image/png');
+  };
+
+  image.src = avatarDraft;
+}
 
   return (
     <div className="modal-backdrop" role="presentation">
@@ -937,9 +977,9 @@ function AvatarEditor({ profileSettings, setProfileSettings, setMessage, onClose
           <button type="button" className="secondary-button" onClick={() => setAvatarDraft('')}>
             Remove
           </button>
-          <button type="button" className="primary-button" onClick={saveAvatar}>
+          <button type="button" className="primary-button" onClick={saveAvatar} disabled={avatarUploading}>
             <Check size={16} />
-            Confirm
+            {avatarUploading ? 'Uploading...' : 'Confirm'}
           </button>
         </div>
         <canvas ref={canvasRef} className="avatar-canvas" />

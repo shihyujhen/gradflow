@@ -8,3 +8,5 @@ v2/
 *.log
 .env
 frontend/.env.local
+aws/
+awscliv2.zip
