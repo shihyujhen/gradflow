@@ -16,14 +16,18 @@ public class DemoDataInitializer implements ApplicationRunner {
 
     private final UserDataRepository userDataRepository;
     private final JdbcTemplate jdbcTemplate;
+    private final AuthService authService;
 
-    public DemoDataInitializer(UserDataRepository userDataRepository, JdbcTemplate jdbcTemplate) {
+    public DemoDataInitializer(UserDataRepository userDataRepository, JdbcTemplate jdbcTemplate, AuthService authService) {
         this.userDataRepository = userDataRepository;
         this.jdbcTemplate = jdbcTemplate;
+        this.authService = authService;
     }
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
+        authService.ensureDemoAccount();
+
         if (userDataRepository.existsById(DEMO_EMAIL)) {
             return;
         }
