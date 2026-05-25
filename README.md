@@ -88,7 +88,7 @@ GitHub --> EC2[AWS EC2 Deployment]
 
 - PostgreSQL
 
-  ```mermaid
+```mermaid
 erDiagram
     AUTH_ACCOUNTS {
         string email PK
