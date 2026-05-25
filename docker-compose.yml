@@ -34,13 +34,11 @@ services:
     build:
       context: ./backend
     container_name: gradflow-backend
-    depends_on:
-      postgres:
-        condition: service_healthy
+    depends_on: []
     environment:
-      DATABASE_URL: jdbc:postgresql://postgres:5432/gradflow
+      DATABASE_URL: jdbc:postgresql://gradflow-db.cfm4eaqekvvc.ap-northeast-1.rds.amazonaws.com:5432/postgres
       DATABASE_USERNAME: gradflow
-      DATABASE_PASSWORD: gradflow
+      DATABASE_PASSWORD: gradflow123456
       APP_CORS_ALLOWED_ORIGIN: http://54.65.20.129
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
