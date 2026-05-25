@@ -46,6 +46,7 @@ http://54.65.20.129/
 - Amazon S3 avatar upload
 - IAM role-based AWS authentication
 - Production-ready multi-container architecture
+- Amazon RDS PostgreSQL migration
 
 
 ## Architecture
@@ -86,6 +87,36 @@ GitHub --> EC2[AWS EC2 Deployment]
 ### Database
 
 - PostgreSQL
+
+  ```mermaid
+erDiagram
+    AUTH_ACCOUNTS {
+        string email PK
+        string password_hash
+        string password_salt
+        datetime created_at
+        datetime updated_at
+    }
+
+    USER_DATA {
+        string email PK
+        text payload
+        datetime updated_at
+    }
+
+    USER_DATA ||--|| PAYLOAD : contains
+    PAYLOAD ||--o{ TASKS : contains
+    PAYLOAD ||--o{ DAILY_LOGS : contains
+    PAYLOAD ||--o{ HABITS : contains
+    PAYLOAD ||--o{ EXPENSES : contains
+    PAYLOAD ||--o{ GOALS : contains
+    PAYLOAD ||--o{ CALENDAR_EVENTS : contains
+    PAYLOAD ||--o{ RESEARCH_LOGS : contains
+    PAYLOAD ||--o{ REWARD_ITEMS : contains
+    PAYLOAD ||--o{ REWARD_REDEMPTIONS : contains
+```
+
+
 
 ### Infrastructure
 - Docker Compose
@@ -204,11 +235,10 @@ docs/aws-deployment.md
 
 ## Planned Improvements
 
-* Amazon RDS PostgreSQL migration
 * GitHub Actions CI/CD
 * CloudWatch logging integration
 * HTTPS with ALB + ACM
 * Lambda-based image processing
 * User authentication system
 * Presigned S3 upload URLs
-* Account creation, password hashing, sessions/JWT, and authorization fully into the backend.
+* sessions/JWT and authorization fully into the backend.
