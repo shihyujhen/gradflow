@@ -1,21 +1,12 @@
 package com.procrastiless.api.model;
 
-import jakarta.persistence.*;
 import java.time.LocalDate;
 
-@Entity
-@Table(name = "habit_records")
 public class HabitRecord {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @ManyToOne(optional = false)
     private Habit habit;
 
     private String userEmail = "demo@gradflow.local";
-
-    @Column(nullable = false)
     private LocalDate recordDate;
 
     private int count;

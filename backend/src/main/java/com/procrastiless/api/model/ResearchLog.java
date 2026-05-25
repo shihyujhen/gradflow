@@ -1,30 +1,15 @@
 package com.procrastiless.api.model;
 
-import jakarta.persistence.*;
 import java.time.LocalDate;
 
-@Entity
-@Table(name = "research_logs")
 public class ResearchLog {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = false)
     private LocalDate logDate;
 
     private String userEmail = "demo@gradflow.local";
-
-    @Column(nullable = false)
     private String topic;
-
-    @Column(length = 2000)
     private String progress;
-
-    @Column(length = 2000)
     private String blockers;
-
-    @Column(length = 2000)
     private String nextStep;
 
     private boolean blockerSolved;

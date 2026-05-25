@@ -1,20 +1,11 @@
 package com.procrastiless.api.model;
 
-import jakarta.persistence.*;
 
-@Entity
-@Table(name = "habits")
 public class Habit {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = false)
     private String name;
 
     private String userEmail = "demo@gradflow.local";
-
-    @Column(nullable = false)
     private int targetCount;
 
     private String unit;

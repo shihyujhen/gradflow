@@ -1,132 +1,137 @@
-insert into goals (id, user_email, title, category, target_date, progress, completed)
-values
-  (1, 'demo@gradflow.local', 'Stabilize weekly research rhythm', 'Research', current_date + 30, 35, false),
-  (2, 'demo@gradflow.local', 'Build a sustainable health routine', 'Health', current_date + 45, 42, false),
-  (3, 'demo@gradflow.local', 'Keep monthly spending under budget', 'Money', current_date + 20, 55, false),
-  (4, 'demo@gradflow.local', 'Finish course assignment draft', 'Course', current_date + 12, 70, false)
-on conflict (id) do nothing;
-
-insert into habits (id, user_email, name, target_count, unit, icon, goal_id)
-values
-  (1, 'demo@gradflow.local', 'Drink water', 1, 'check', '💧', 2),
-  (2, 'demo@gradflow.local', 'Exercise', 1, 'check', '🏃', 2),
-  (3, 'demo@gradflow.local', 'Read paper', 1, 'check', '📚', 1),
-  (4, 'demo@gradflow.local', 'Budget check', 1, 'check', '🪙', 3)
-on conflict (id) do nothing;
-
-insert into reward_items (id, user_email, name, icon, point_cost)
-values
-  (1, 'demo@gradflow.local', 'Coffee break', '☕', 4),
-  (2, 'demo@gradflow.local', 'Movie night', '🎬', 8),
-  (3, 'demo@gradflow.local', 'Bookstore visit', '📚', 12)
-on conflict (id) do nothing;
-
-insert into tasks (id, user_email, name, category, priority, effort, deadline, status, created_at, updated_at, goal_id)
-values
-  (1, 'demo@gradflow.local', 'Annotate related-work paper', 'Research', 5, 3, current_date - 6, 'DONE', current_timestamp - interval '12 day', current_timestamp - interval '6 day', 1),
-  (2, 'demo@gradflow.local', 'Write experiment setup notes', 'Research', 4, 2, current_date - 3, 'DONE', current_timestamp - interval '9 day', current_timestamp - interval '3 day', 1),
-  (3, 'demo@gradflow.local', 'Prepare advisor meeting questions', 'Meeting', 4, 2, current_date, 'PENDING', current_timestamp - interval '2 day', current_timestamp - interval '2 day', 1),
-  (4, 'demo@gradflow.local', 'Implement baseline comparison', 'Research', 5, 4, current_date + 2, 'PENDING', current_timestamp - interval '1 day', current_timestamp - interval '1 day', 1),
-  (5, 'demo@gradflow.local', 'Submit course reading response', 'Course', 3, 2, current_date + 1, 'PENDING', current_timestamp - interval '3 day', current_timestamp - interval '3 day', 4),
-  (6, 'demo@gradflow.local', 'Plan next exercise block', 'Health', 3, 1, current_date + 1, 'PENDING', current_timestamp - interval '1 day', current_timestamp - interval '1 day', 2),
-  (7, 'demo@gradflow.local', 'Reconcile this week expenses', 'Money', 3, 1, current_date + 3, 'PENDING', current_timestamp - interval '4 day', current_timestamp - interval '4 day', 3),
-  (8, 'demo@gradflow.local', 'Draft intro paragraph', 'Research', 4, 3, current_date + 5, 'PENDING', current_timestamp, current_timestamp, 1)
-on conflict (id) do nothing;
-
-insert into daily_logs (
-  id, user_email, log_date, sleep_hours, sleep_start, wake_time, mood, stress, study_hours,
-  water_cups, water_ml, exercised, exercise_type, exercise_minutes, note, updated_at
+insert into user_data (email, payload, updated_at)
+values (
+  'demo@gradflow.local',
+  jsonb_build_object(
+    'goals', jsonb_build_array(
+      jsonb_build_object('id', 1, 'userEmail', 'demo@gradflow.local', 'title', 'Stabilize weekly research rhythm', 'category', 'Research', 'targetDate', (current_date + 30)::text, 'progress', 35, 'completed', false),
+      jsonb_build_object('id', 2, 'userEmail', 'demo@gradflow.local', 'title', 'Build a sustainable health routine', 'category', 'Health', 'targetDate', (current_date + 45)::text, 'progress', 42, 'completed', false),
+      jsonb_build_object('id', 3, 'userEmail', 'demo@gradflow.local', 'title', 'Keep monthly spending under budget', 'category', 'Money', 'targetDate', (current_date + 20)::text, 'progress', 55, 'completed', false),
+      jsonb_build_object('id', 4, 'userEmail', 'demo@gradflow.local', 'title', 'Finish course assignment draft', 'category', 'Course', 'targetDate', (current_date + 12)::text, 'progress', 70, 'completed', false)
+    ),
+    'habits', jsonb_build_array(
+      jsonb_build_object('id', 1, 'userEmail', 'demo@gradflow.local', 'name', 'Drink water', 'targetCount', 1, 'unit', 'check', 'icon', '*', 'goalId', 2),
+      jsonb_build_object('id', 2, 'userEmail', 'demo@gradflow.local', 'name', 'Exercise', 'targetCount', 1, 'unit', 'check', 'icon', '*', 'goalId', 2),
+      jsonb_build_object('id', 3, 'userEmail', 'demo@gradflow.local', 'name', 'Read paper', 'targetCount', 1, 'unit', 'check', 'icon', '*', 'goalId', 1),
+      jsonb_build_object('id', 4, 'userEmail', 'demo@gradflow.local', 'name', 'Budget check', 'targetCount', 1, 'unit', 'check', 'icon', '*', 'goalId', 3)
+    ),
+    'rewardItems', jsonb_build_array(
+      jsonb_build_object('id', 1, 'userEmail', 'demo@gradflow.local', 'name', 'Coffee break', 'icon', '*', 'pointCost', 4),
+      jsonb_build_object('id', 2, 'userEmail', 'demo@gradflow.local', 'name', 'Movie night', 'icon', '*', 'pointCost', 8),
+      jsonb_build_object('id', 3, 'userEmail', 'demo@gradflow.local', 'name', 'Bookstore visit', 'icon', '*', 'pointCost', 12)
+    ),
+    'tasks', jsonb_build_array(
+      jsonb_build_object('id', 1, 'userEmail', 'demo@gradflow.local', 'name', 'Annotate related-work paper', 'category', 'Research', 'priority', 5, 'effort', 3, 'deadline', (current_date - 6)::text, 'status', 'DONE', 'createdAt', to_char(current_timestamp - interval '12 day', 'YYYY-MM-DD"T"HH24:MI:SS'), 'updatedAt', to_char(current_timestamp - interval '6 day', 'YYYY-MM-DD"T"HH24:MI:SS'), 'goalId', 1),
+      jsonb_build_object('id', 2, 'userEmail', 'demo@gradflow.local', 'name', 'Write experiment setup notes', 'category', 'Research', 'priority', 4, 'effort', 2, 'deadline', (current_date - 3)::text, 'status', 'DONE', 'createdAt', to_char(current_timestamp - interval '9 day', 'YYYY-MM-DD"T"HH24:MI:SS'), 'updatedAt', to_char(current_timestamp - interval '3 day', 'YYYY-MM-DD"T"HH24:MI:SS'), 'goalId', 1),
+      jsonb_build_object('id', 3, 'userEmail', 'demo@gradflow.local', 'name', 'Prepare advisor meeting questions', 'category', 'Meeting', 'priority', 4, 'effort', 2, 'deadline', current_date::text, 'status', 'PENDING', 'createdAt', to_char(current_timestamp - interval '2 day', 'YYYY-MM-DD"T"HH24:MI:SS'), 'updatedAt', to_char(current_timestamp - interval '2 day', 'YYYY-MM-DD"T"HH24:MI:SS'), 'goalId', 1),
+      jsonb_build_object('id', 4, 'userEmail', 'demo@gradflow.local', 'name', 'Implement baseline comparison', 'category', 'Research', 'priority', 5, 'effort', 4, 'deadline', (current_date + 2)::text, 'status', 'PENDING', 'createdAt', to_char(current_timestamp - interval '1 day', 'YYYY-MM-DD"T"HH24:MI:SS'), 'updatedAt', to_char(current_timestamp - interval '1 day', 'YYYY-MM-DD"T"HH24:MI:SS'), 'goalId', 1),
+      jsonb_build_object('id', 5, 'userEmail', 'demo@gradflow.local', 'name', 'Submit course reading response', 'category', 'Course', 'priority', 3, 'effort', 2, 'deadline', (current_date + 1)::text, 'status', 'PENDING', 'createdAt', to_char(current_timestamp - interval '3 day', 'YYYY-MM-DD"T"HH24:MI:SS'), 'updatedAt', to_char(current_timestamp - interval '3 day', 'YYYY-MM-DD"T"HH24:MI:SS'), 'goalId', 4),
+      jsonb_build_object('id', 6, 'userEmail', 'demo@gradflow.local', 'name', 'Plan next exercise block', 'category', 'Health', 'priority', 3, 'effort', 1, 'deadline', (current_date + 1)::text, 'status', 'PENDING', 'createdAt', to_char(current_timestamp - interval '1 day', 'YYYY-MM-DD"T"HH24:MI:SS'), 'updatedAt', to_char(current_timestamp - interval '1 day', 'YYYY-MM-DD"T"HH24:MI:SS'), 'goalId', 2),
+      jsonb_build_object('id', 7, 'userEmail', 'demo@gradflow.local', 'name', 'Reconcile this week expenses', 'category', 'Money', 'priority', 3, 'effort', 1, 'deadline', (current_date + 3)::text, 'status', 'PENDING', 'createdAt', to_char(current_timestamp - interval '4 day', 'YYYY-MM-DD"T"HH24:MI:SS'), 'updatedAt', to_char(current_timestamp - interval '4 day', 'YYYY-MM-DD"T"HH24:MI:SS'), 'goalId', 3),
+      jsonb_build_object('id', 8, 'userEmail', 'demo@gradflow.local', 'name', 'Draft intro paragraph', 'category', 'Research', 'priority', 4, 'effort', 3, 'deadline', (current_date + 5)::text, 'status', 'PENDING', 'createdAt', to_char(current_timestamp, 'YYYY-MM-DD"T"HH24:MI:SS'), 'updatedAt', to_char(current_timestamp, 'YYYY-MM-DD"T"HH24:MI:SS'), 'goalId', 1)
+    ),
+    'dailyLogs', jsonb_build_array(
+      jsonb_build_object('id', 1, 'userEmail', 'demo@gradflow.local', 'logDate', (current_date - 13)::text, 'sleepHours', 6.8, 'sleepStart', '00:40:00', 'wakeTime', '07:30:00', 'mood', 3, 'stress', 4, 'studyHours', 2.0, 'waterCups', 6, 'waterMl', 1500, 'exercised', true, 'exerciseType', 'Walk', 'exerciseMinutes', 25, 'note', 'Recovered from a packed meeting day.', 'updatedAt', to_char(current_timestamp - interval '13 day', 'YYYY-MM-DD"T"HH24:MI:SS')),
+      jsonb_build_object('id', 2, 'userEmail', 'demo@gradflow.local', 'logDate', (current_date - 12)::text, 'sleepHours', 7.4, 'sleepStart', '00:10:00', 'wakeTime', '07:35:00', 'mood', 4, 'stress', 3, 'studyHours', 3.0, 'waterCups', 8, 'waterMl', 2000, 'exercised', false, 'exerciseType', '', 'exerciseMinutes', 0, 'note', 'Read two papers and made short notes.', 'updatedAt', to_char(current_timestamp - interval '12 day', 'YYYY-MM-DD"T"HH24:MI:SS')),
+      jsonb_build_object('id', 3, 'userEmail', 'demo@gradflow.local', 'logDate', (current_date - 11)::text, 'sleepHours', 6.2, 'sleepStart', '01:20:00', 'wakeTime', '07:30:00', 'mood', 2, 'stress', 5, 'studyHours', 1.0, 'waterCups', 5, 'waterMl', 1250, 'exercised', true, 'exerciseType', 'Stretching', 'exerciseMinutes', 15, 'note', 'Low energy, kept the scope small.', 'updatedAt', to_char(current_timestamp - interval '11 day', 'YYYY-MM-DD"T"HH24:MI:SS')),
+      jsonb_build_object('id', 4, 'userEmail', 'demo@gradflow.local', 'logDate', (current_date - 10)::text, 'sleepHours', 7.8, 'sleepStart', '23:50:00', 'wakeTime', '07:40:00', 'mood', 4, 'stress', 2, 'studyHours', 3.5, 'waterCups', 9, 'waterMl', 2250, 'exercised', true, 'exerciseType', 'Gym', 'exerciseMinutes', 35, 'note', 'Good focus block after lunch.', 'updatedAt', to_char(current_timestamp - interval '10 day', 'YYYY-MM-DD"T"HH24:MI:SS')),
+      jsonb_build_object('id', 5, 'userEmail', 'demo@gradflow.local', 'logDate', (current_date - 9)::text, 'sleepHours', 7.0, 'sleepStart', '00:30:00', 'wakeTime', '07:30:00', 'mood', 3, 'stress', 3, 'studyHours', 2.5, 'waterCups', 7, 'waterMl', 1750, 'exercised', false, 'exerciseType', '', 'exerciseMinutes', 0, 'note', 'Admin tasks took longer than expected.', 'updatedAt', to_char(current_timestamp - interval '9 day', 'YYYY-MM-DD"T"HH24:MI:SS')),
+      jsonb_build_object('id', 6, 'userEmail', 'demo@gradflow.local', 'logDate', (current_date - 8)::text, 'sleepHours', 8.1, 'sleepStart', '23:40:00', 'wakeTime', '07:45:00', 'mood', 5, 'stress', 2, 'studyHours', 4.0, 'waterCups', 10, 'waterMl', 2500, 'exercised', true, 'exerciseType', 'Run', 'exerciseMinutes', 30, 'note', 'Finished experiment setup notes.', 'updatedAt', to_char(current_timestamp - interval '8 day', 'YYYY-MM-DD"T"HH24:MI:SS')),
+      jsonb_build_object('id', 7, 'userEmail', 'demo@gradflow.local', 'logDate', (current_date - 7)::text, 'sleepHours', 6.6, 'sleepStart', '01:00:00', 'wakeTime', '07:35:00', 'mood', 3, 'stress', 4, 'studyHours', 2.0, 'waterCups', 6, 'waterMl', 1500, 'exercised', false, 'exerciseType', '', 'exerciseMinutes', 0, 'note', 'Needed more breaks between tasks.', 'updatedAt', to_char(current_timestamp - interval '7 day', 'YYYY-MM-DD"T"HH24:MI:SS')),
+      jsonb_build_object('id', 8, 'userEmail', 'demo@gradflow.local', 'logDate', (current_date - 6)::text, 'sleepHours', 7.2, 'sleepStart', '00:15:00', 'wakeTime', '07:30:00', 'mood', 4, 'stress', 3, 'studyHours', 3.0, 'waterCups', 8, 'waterMl', 2000, 'exercised', true, 'exerciseType', 'Walk', 'exerciseMinutes', 20, 'note', 'Advisor feedback was actionable.', 'updatedAt', to_char(current_timestamp - interval '6 day', 'YYYY-MM-DD"T"HH24:MI:SS')),
+      jsonb_build_object('id', 9, 'userEmail', 'demo@gradflow.local', 'logDate', (current_date - 5)::text, 'sleepHours', 7.6, 'sleepStart', '23:55:00', 'wakeTime', '07:30:00', 'mood', 4, 'stress', 2, 'studyHours', 3.5, 'waterCups', 9, 'waterMl', 2250, 'exercised', true, 'exerciseType', 'Yoga', 'exerciseMinutes', 25, 'note', 'Cleaned up notes and references.', 'updatedAt', to_char(current_timestamp - interval '5 day', 'YYYY-MM-DD"T"HH24:MI:SS')),
+      jsonb_build_object('id', 10, 'userEmail', 'demo@gradflow.local', 'logDate', (current_date - 4)::text, 'sleepHours', 5.9, 'sleepStart', '01:35:00', 'wakeTime', '07:30:00', 'mood', 2, 'stress', 5, 'studyHours', 1.0, 'waterCups', 4, 'waterMl', 1000, 'exercised', false, 'exerciseType', '', 'exerciseMinutes', 0, 'note', 'Deadline pressure; need lighter planning.', 'updatedAt', to_char(current_timestamp - interval '4 day', 'YYYY-MM-DD"T"HH24:MI:SS')),
+      jsonb_build_object('id', 11, 'userEmail', 'demo@gradflow.local', 'logDate', (current_date - 3)::text, 'sleepHours', 7.3, 'sleepStart', '00:05:00', 'wakeTime', '07:25:00', 'mood', 4, 'stress', 3, 'studyHours', 2.5, 'waterCups', 8, 'waterMl', 2000, 'exercised', true, 'exerciseType', 'Gym', 'exerciseMinutes', 40, 'note', 'Submitted reading response draft.', 'updatedAt', to_char(current_timestamp - interval '3 day', 'YYYY-MM-DD"T"HH24:MI:SS')),
+      jsonb_build_object('id', 12, 'userEmail', 'demo@gradflow.local', 'logDate', (current_date - 2)::text, 'sleepHours', 8.0, 'sleepStart', '23:30:00', 'wakeTime', '07:30:00', 'mood', 5, 'stress', 2, 'studyHours', 4.5, 'waterCups', 10, 'waterMl', 2500, 'exercised', true, 'exerciseType', 'Run', 'exerciseMinutes', 30, 'note', 'Strong deep work session.', 'updatedAt', to_char(current_timestamp - interval '2 day', 'YYYY-MM-DD"T"HH24:MI:SS')),
+      jsonb_build_object('id', 13, 'userEmail', 'demo@gradflow.local', 'logDate', (current_date - 1)::text, 'sleepHours', 6.7, 'sleepStart', '00:50:00', 'wakeTime', '07:35:00', 'mood', 3, 'stress', 4, 'studyHours', 2.0, 'waterCups', 7, 'waterMl', 1750, 'exercised', false, 'exerciseType', '', 'exerciseMinutes', 0, 'note', 'Blocked on baseline comparison detail.', 'updatedAt', to_char(current_timestamp - interval '1 day', 'YYYY-MM-DD"T"HH24:MI:SS')),
+      jsonb_build_object('id', 14, 'userEmail', 'demo@gradflow.local', 'logDate', current_date::text, 'sleepHours', 7.5, 'sleepStart', '00:00:00', 'wakeTime', '07:30:00', 'mood', 4, 'stress', 3, 'studyHours', 1.5, 'waterCups', 8, 'waterMl', 2000, 'exercised', true, 'exerciseType', 'Walk', 'exerciseMinutes', 20, 'note', 'Seed check-in for first launch.', 'updatedAt', to_char(current_timestamp, 'YYYY-MM-DD"T"HH24:MI:SS'))
+    ),
+    'habitRecords', jsonb_build_array(
+      jsonb_build_object('id', 1, 'userEmail', 'demo@gradflow.local', 'habit', jsonb_build_object('id', 1, 'name', 'Drink water', 'targetCount', 1, 'unit', 'check', 'icon', '*', 'goalId', 2), 'recordDate', (current_date - 13)::text, 'count', 1),
+      jsonb_build_object('id', 2, 'userEmail', 'demo@gradflow.local', 'habit', jsonb_build_object('id', 3, 'name', 'Read paper', 'targetCount', 1, 'unit', 'check', 'icon', '*', 'goalId', 1), 'recordDate', (current_date - 13)::text, 'count', 1),
+      jsonb_build_object('id', 3, 'userEmail', 'demo@gradflow.local', 'habit', jsonb_build_object('id', 1, 'name', 'Drink water', 'targetCount', 1, 'unit', 'check', 'icon', '*', 'goalId', 2), 'recordDate', (current_date - 12)::text, 'count', 1),
+      jsonb_build_object('id', 4, 'userEmail', 'demo@gradflow.local', 'habit', jsonb_build_object('id', 3, 'name', 'Read paper', 'targetCount', 1, 'unit', 'check', 'icon', '*', 'goalId', 1), 'recordDate', (current_date - 12)::text, 'count', 1),
+      jsonb_build_object('id', 5, 'userEmail', 'demo@gradflow.local', 'habit', jsonb_build_object('id', 4, 'name', 'Budget check', 'targetCount', 1, 'unit', 'check', 'icon', '*', 'goalId', 3), 'recordDate', (current_date - 12)::text, 'count', 1),
+      jsonb_build_object('id', 6, 'userEmail', 'demo@gradflow.local', 'habit', jsonb_build_object('id', 1, 'name', 'Drink water', 'targetCount', 1, 'unit', 'check', 'icon', '*', 'goalId', 2), 'recordDate', (current_date - 11)::text, 'count', 1),
+      jsonb_build_object('id', 7, 'userEmail', 'demo@gradflow.local', 'habit', jsonb_build_object('id', 2, 'name', 'Exercise', 'targetCount', 1, 'unit', 'check', 'icon', '*', 'goalId', 2), 'recordDate', (current_date - 11)::text, 'count', 1),
+      jsonb_build_object('id', 8, 'userEmail', 'demo@gradflow.local', 'habit', jsonb_build_object('id', 1, 'name', 'Drink water', 'targetCount', 1, 'unit', 'check', 'icon', '*', 'goalId', 2), 'recordDate', (current_date - 10)::text, 'count', 1),
+      jsonb_build_object('id', 9, 'userEmail', 'demo@gradflow.local', 'habit', jsonb_build_object('id', 2, 'name', 'Exercise', 'targetCount', 1, 'unit', 'check', 'icon', '*', 'goalId', 2), 'recordDate', (current_date - 10)::text, 'count', 1),
+      jsonb_build_object('id', 10, 'userEmail', 'demo@gradflow.local', 'habit', jsonb_build_object('id', 3, 'name', 'Read paper', 'targetCount', 1, 'unit', 'check', 'icon', '*', 'goalId', 1), 'recordDate', (current_date - 10)::text, 'count', 1),
+      jsonb_build_object('id', 11, 'userEmail', 'demo@gradflow.local', 'habit', jsonb_build_object('id', 1, 'name', 'Drink water', 'targetCount', 1, 'unit', 'check', 'icon', '*', 'goalId', 2), 'recordDate', (current_date - 9)::text, 'count', 1),
+      jsonb_build_object('id', 12, 'userEmail', 'demo@gradflow.local', 'habit', jsonb_build_object('id', 4, 'name', 'Budget check', 'targetCount', 1, 'unit', 'check', 'icon', '*', 'goalId', 3), 'recordDate', (current_date - 9)::text, 'count', 1),
+      jsonb_build_object('id', 13, 'userEmail', 'demo@gradflow.local', 'habit', jsonb_build_object('id', 1, 'name', 'Drink water', 'targetCount', 1, 'unit', 'check', 'icon', '*', 'goalId', 2), 'recordDate', (current_date - 8)::text, 'count', 1),
+      jsonb_build_object('id', 14, 'userEmail', 'demo@gradflow.local', 'habit', jsonb_build_object('id', 2, 'name', 'Exercise', 'targetCount', 1, 'unit', 'check', 'icon', '*', 'goalId', 2), 'recordDate', (current_date - 8)::text, 'count', 1),
+      jsonb_build_object('id', 15, 'userEmail', 'demo@gradflow.local', 'habit', jsonb_build_object('id', 3, 'name', 'Read paper', 'targetCount', 1, 'unit', 'check', 'icon', '*', 'goalId', 1), 'recordDate', (current_date - 8)::text, 'count', 1),
+      jsonb_build_object('id', 16, 'userEmail', 'demo@gradflow.local', 'habit', jsonb_build_object('id', 1, 'name', 'Drink water', 'targetCount', 1, 'unit', 'check', 'icon', '*', 'goalId', 2), 'recordDate', (current_date - 7)::text, 'count', 1),
+      jsonb_build_object('id', 17, 'userEmail', 'demo@gradflow.local', 'habit', jsonb_build_object('id', 1, 'name', 'Drink water', 'targetCount', 1, 'unit', 'check', 'icon', '*', 'goalId', 2), 'recordDate', (current_date - 6)::text, 'count', 1),
+      jsonb_build_object('id', 18, 'userEmail', 'demo@gradflow.local', 'habit', jsonb_build_object('id', 2, 'name', 'Exercise', 'targetCount', 1, 'unit', 'check', 'icon', '*', 'goalId', 2), 'recordDate', (current_date - 6)::text, 'count', 1),
+      jsonb_build_object('id', 19, 'userEmail', 'demo@gradflow.local', 'habit', jsonb_build_object('id', 3, 'name', 'Read paper', 'targetCount', 1, 'unit', 'check', 'icon', '*', 'goalId', 1), 'recordDate', (current_date - 6)::text, 'count', 1),
+      jsonb_build_object('id', 20, 'userEmail', 'demo@gradflow.local', 'habit', jsonb_build_object('id', 1, 'name', 'Drink water', 'targetCount', 1, 'unit', 'check', 'icon', '*', 'goalId', 2), 'recordDate', (current_date - 5)::text, 'count', 1),
+      jsonb_build_object('id', 21, 'userEmail', 'demo@gradflow.local', 'habit', jsonb_build_object('id', 2, 'name', 'Exercise', 'targetCount', 1, 'unit', 'check', 'icon', '*', 'goalId', 2), 'recordDate', (current_date - 5)::text, 'count', 1),
+      jsonb_build_object('id', 22, 'userEmail', 'demo@gradflow.local', 'habit', jsonb_build_object('id', 4, 'name', 'Budget check', 'targetCount', 1, 'unit', 'check', 'icon', '*', 'goalId', 3), 'recordDate', (current_date - 5)::text, 'count', 1),
+      jsonb_build_object('id', 23, 'userEmail', 'demo@gradflow.local', 'habit', jsonb_build_object('id', 1, 'name', 'Drink water', 'targetCount', 1, 'unit', 'check', 'icon', '*', 'goalId', 2), 'recordDate', (current_date - 4)::text, 'count', 1),
+      jsonb_build_object('id', 24, 'userEmail', 'demo@gradflow.local', 'habit', jsonb_build_object('id', 1, 'name', 'Drink water', 'targetCount', 1, 'unit', 'check', 'icon', '*', 'goalId', 2), 'recordDate', (current_date - 3)::text, 'count', 1),
+      jsonb_build_object('id', 25, 'userEmail', 'demo@gradflow.local', 'habit', jsonb_build_object('id', 2, 'name', 'Exercise', 'targetCount', 1, 'unit', 'check', 'icon', '*', 'goalId', 2), 'recordDate', (current_date - 3)::text, 'count', 1),
+      jsonb_build_object('id', 26, 'userEmail', 'demo@gradflow.local', 'habit', jsonb_build_object('id', 3, 'name', 'Read paper', 'targetCount', 1, 'unit', 'check', 'icon', '*', 'goalId', 1), 'recordDate', (current_date - 3)::text, 'count', 1),
+      jsonb_build_object('id', 27, 'userEmail', 'demo@gradflow.local', 'habit', jsonb_build_object('id', 1, 'name', 'Drink water', 'targetCount', 1, 'unit', 'check', 'icon', '*', 'goalId', 2), 'recordDate', (current_date - 2)::text, 'count', 1),
+      jsonb_build_object('id', 28, 'userEmail', 'demo@gradflow.local', 'habit', jsonb_build_object('id', 2, 'name', 'Exercise', 'targetCount', 1, 'unit', 'check', 'icon', '*', 'goalId', 2), 'recordDate', (current_date - 2)::text, 'count', 1),
+      jsonb_build_object('id', 29, 'userEmail', 'demo@gradflow.local', 'habit', jsonb_build_object('id', 3, 'name', 'Read paper', 'targetCount', 1, 'unit', 'check', 'icon', '*', 'goalId', 1), 'recordDate', (current_date - 2)::text, 'count', 1),
+      jsonb_build_object('id', 30, 'userEmail', 'demo@gradflow.local', 'habit', jsonb_build_object('id', 4, 'name', 'Budget check', 'targetCount', 1, 'unit', 'check', 'icon', '*', 'goalId', 3), 'recordDate', (current_date - 2)::text, 'count', 1),
+      jsonb_build_object('id', 31, 'userEmail', 'demo@gradflow.local', 'habit', jsonb_build_object('id', 1, 'name', 'Drink water', 'targetCount', 1, 'unit', 'check', 'icon', '*', 'goalId', 2), 'recordDate', (current_date - 1)::text, 'count', 1),
+      jsonb_build_object('id', 32, 'userEmail', 'demo@gradflow.local', 'habit', jsonb_build_object('id', 3, 'name', 'Read paper', 'targetCount', 1, 'unit', 'check', 'icon', '*', 'goalId', 1), 'recordDate', (current_date - 1)::text, 'count', 1),
+      jsonb_build_object('id', 33, 'userEmail', 'demo@gradflow.local', 'habit', jsonb_build_object('id', 1, 'name', 'Drink water', 'targetCount', 1, 'unit', 'check', 'icon', '*', 'goalId', 2), 'recordDate', current_date::text, 'count', 1),
+      jsonb_build_object('id', 34, 'userEmail', 'demo@gradflow.local', 'habit', jsonb_build_object('id', 2, 'name', 'Exercise', 'targetCount', 1, 'unit', 'check', 'icon', '*', 'goalId', 2), 'recordDate', current_date::text, 'count', 1)
+    ),
+    'expenses', jsonb_build_array(
+      jsonb_build_object('id', 1, 'userEmail', 'demo@gradflow.local', 'expenseDate', (current_date - 13)::text, 'category', 'Food', 'type', 'EXPENSE', 'amount', 180, 'description', 'Lunch box'),
+      jsonb_build_object('id', 2, 'userEmail', 'demo@gradflow.local', 'expenseDate', (current_date - 12)::text, 'category', 'Coffee', 'type', 'EXPENSE', 'amount', 85, 'description', 'Cafe study block'),
+      jsonb_build_object('id', 3, 'userEmail', 'demo@gradflow.local', 'expenseDate', (current_date - 11)::text, 'category', 'Transport', 'type', 'EXPENSE', 'amount', 40, 'description', 'Bus to campus'),
+      jsonb_build_object('id', 4, 'userEmail', 'demo@gradflow.local', 'expenseDate', (current_date - 10)::text, 'category', 'Books', 'type', 'EXPENSE', 'amount', 620, 'description', 'Research methods book'),
+      jsonb_build_object('id', 5, 'userEmail', 'demo@gradflow.local', 'expenseDate', (current_date - 9)::text, 'category', 'Scholarship', 'type', 'INCOME', 'amount', 8000, 'description', 'Monthly scholarship'),
+      jsonb_build_object('id', 6, 'userEmail', 'demo@gradflow.local', 'expenseDate', (current_date - 8)::text, 'category', 'Food', 'type', 'EXPENSE', 'amount', 210, 'description', 'Dinner'),
+      jsonb_build_object('id', 7, 'userEmail', 'demo@gradflow.local', 'expenseDate', (current_date - 7)::text, 'category', 'Health', 'type', 'EXPENSE', 'amount', 350, 'description', 'Gym day pass'),
+      jsonb_build_object('id', 8, 'userEmail', 'demo@gradflow.local', 'expenseDate', (current_date - 6)::text, 'category', 'Coffee', 'type', 'EXPENSE', 'amount', 95, 'description', 'Advisor meeting coffee'),
+      jsonb_build_object('id', 9, 'userEmail', 'demo@gradflow.local', 'expenseDate', (current_date - 5)::text, 'category', 'Shopping', 'type', 'EXPENSE', 'amount', 480, 'description', 'Stationery'),
+      jsonb_build_object('id', 10, 'userEmail', 'demo@gradflow.local', 'expenseDate', (current_date - 4)::text, 'category', 'Food', 'type', 'EXPENSE', 'amount', 160, 'description', 'Noodles'),
+      jsonb_build_object('id', 11, 'userEmail', 'demo@gradflow.local', 'expenseDate', (current_date - 3)::text, 'category', 'Transport', 'type', 'EXPENSE', 'amount', 60, 'description', 'MRT'),
+      jsonb_build_object('id', 12, 'userEmail', 'demo@gradflow.local', 'expenseDate', (current_date - 2)::text, 'category', 'Part-time', 'type', 'INCOME', 'amount', 2200, 'description', 'TA support'),
+      jsonb_build_object('id', 13, 'userEmail', 'demo@gradflow.local', 'expenseDate', (current_date - 1)::text, 'category', 'Fun', 'type', 'EXPENSE', 'amount', 300, 'description', 'Relax night'),
+      jsonb_build_object('id', 14, 'userEmail', 'demo@gradflow.local', 'expenseDate', current_date::text, 'category', 'Food', 'type', 'EXPENSE', 'amount', 190, 'description', 'Lunch')
+    ),
+    'researchLogs', jsonb_build_array(
+      jsonb_build_object('id', 1, 'userEmail', 'demo@gradflow.local', 'logDate', (current_date - 12)::text, 'topic', 'Federated learning survey', 'progress', 'Skimmed three related-work sections.', 'blockers', '', 'nextStep', 'Summarize privacy assumptions.', 'blockerSolved', false, 'nextStepSolved', false, 'hours', 2.0),
+      jsonb_build_object('id', 2, 'userEmail', 'demo@gradflow.local', 'logDate', (current_date - 10)::text, 'topic', 'Baseline experiment', 'progress', 'Prepared dataset split and run notes.', 'blockers', 'Need to confirm metric definition.', 'nextStep', 'Ask advisor about evaluation metric.', 'blockerSolved', false, 'nextStepSolved', false, 'hours', 2.5),
+      jsonb_build_object('id', 3, 'userEmail', 'demo@gradflow.local', 'logDate', (current_date - 8)::text, 'topic', 'Experiment setup', 'progress', 'Finished initial config and command list.', 'blockers', '', 'nextStep', 'Run small-scale sanity check.', 'blockerSolved', false, 'nextStepSolved', false, 'hours', 3.0),
+      jsonb_build_object('id', 4, 'userEmail', 'demo@gradflow.local', 'logDate', (current_date - 6)::text, 'topic', 'Advisor feedback', 'progress', 'Converted feedback into tasks.', 'blockers', '', 'nextStep', 'Draft comparison table.', 'blockerSolved', false, 'nextStepSolved', false, 'hours', 1.5),
+      jsonb_build_object('id', 5, 'userEmail', 'demo@gradflow.local', 'logDate', (current_date - 4)::text, 'topic', 'Related work writing', 'progress', 'Outlined paragraph order.', 'blockers', 'Unsure how to contrast paper B.', 'nextStep', 'Write one rough paragraph anyway.', 'blockerSolved', false, 'nextStepSolved', false, 'hours', 1.0),
+      jsonb_build_object('id', 6, 'userEmail', 'demo@gradflow.local', 'logDate', (current_date - 2)::text, 'topic', 'Baseline comparison', 'progress', 'Ran first comparison pass.', 'blockers', '', 'nextStep', 'Collect charts for meeting.', 'blockerSolved', false, 'nextStepSolved', false, 'hours', 2.5),
+      jsonb_build_object('id', 7, 'userEmail', 'demo@gradflow.local', 'logDate', (current_date - 1)::text, 'topic', 'Error analysis', 'progress', 'Found two suspicious failure cases.', 'blockers', 'Need more examples before conclusion.', 'nextStep', 'Inspect 10 more cases.', 'blockerSolved', false, 'nextStepSolved', false, 'hours', 1.5)
+    ),
+    'calendarEvents', jsonb_build_array(
+      jsonb_build_object('id', 1, 'userEmail', 'demo@gradflow.local', 'title', 'Advisor meeting', 'eventDate', (current_date - 6)::text, 'startDate', (current_date - 6)::text, 'endDate', (current_date - 6)::text, 'startTime', '14:00:00', 'endTime', '15:00:00', 'category', 'Meeting', 'note', 'Discuss experiment direction'),
+      jsonb_build_object('id', 2, 'userEmail', 'demo@gradflow.local', 'title', 'Course seminar', 'eventDate', (current_date - 3)::text, 'startDate', (current_date - 3)::text, 'endDate', (current_date - 3)::text, 'startTime', '10:00:00', 'endTime', '12:00:00', 'category', 'Course', 'note', 'Reading response due'),
+      jsonb_build_object('id', 3, 'userEmail', 'demo@gradflow.local', 'title', 'Gym session', 'eventDate', (current_date - 2)::text, 'startDate', (current_date - 2)::text, 'endDate', (current_date - 2)::text, 'startTime', '18:30:00', 'endTime', '19:15:00', 'category', 'Health', 'note', 'Run and stretch'),
+      jsonb_build_object('id', 4, 'userEmail', 'demo@gradflow.local', 'title', 'Research focus block', 'eventDate', current_date::text, 'startDate', current_date::text, 'endDate', current_date::text, 'startTime', '09:30:00', 'endTime', '11:30:00', 'category', 'Study', 'note', 'Baseline comparison'),
+      jsonb_build_object('id', 5, 'userEmail', 'demo@gradflow.local', 'title', 'Budget review', 'eventDate', (current_date + 2)::text, 'startDate', (current_date + 2)::text, 'endDate', (current_date + 2)::text, 'startTime', '20:00:00', 'endTime', '20:30:00', 'category', 'Life', 'note', 'Check weekly expenses')
+    ),
+    'rewardRedemptions', jsonb_build_array(
+      jsonb_build_object('id', 1, 'userEmail', 'demo@gradflow.local', 'reward', jsonb_build_object('id', 1, 'name', 'Coffee break', 'icon', '*', 'pointCost', 4), 'redeemedDate', (current_date - 8)::text, 'pointCost', 4),
+      jsonb_build_object('id', 2, 'userEmail', 'demo@gradflow.local', 'reward', jsonb_build_object('id', 1, 'name', 'Coffee break', 'icon', '*', 'pointCost', 4), 'redeemedDate', (current_date - 3)::text, 'pointCost', 4),
+      jsonb_build_object('id', 3, 'userEmail', 'demo@gradflow.local', 'reward', jsonb_build_object('id', 2, 'name', 'Movie night', 'icon', '*', 'pointCost', 8), 'redeemedDate', (current_date - 1)::text, 'pointCost', 8)
+    ),
+    'archivedTasks', jsonb_build_array(),
+    'nextIds', jsonb_build_object(
+      'goals', 4,
+      'habits', 4,
+      'rewardItems', 3,
+      'tasks', 8,
+      'dailyLogs', 14,
+      'habitRecords', 34,
+      'expenses', 14,
+      'researchLogs', 7,
+      'calendarEvents', 5,
+      'rewardRedemptions', 3
+    )
+  )::text,
+  current_timestamp
 )
-values
-  (1, 'demo@gradflow.local', current_date - 13, 6.8, time '00:40', time '07:30', 3, 4, 2.0, 6, 1500, true, 'Walk', 25, 'Recovered from a packed meeting day.', current_timestamp - interval '13 day'),
-  (2, 'demo@gradflow.local', current_date - 12, 7.4, time '00:10', time '07:35', 4, 3, 3.0, 8, 2000, false, '', 0, 'Read two papers and made short notes.', current_timestamp - interval '12 day'),
-  (3, 'demo@gradflow.local', current_date - 11, 6.2, time '01:20', time '07:30', 2, 5, 1.0, 5, 1250, true, 'Stretching', 15, 'Low energy, kept the scope small.', current_timestamp - interval '11 day'),
-  (4, 'demo@gradflow.local', current_date - 10, 7.8, time '23:50', time '07:40', 4, 2, 3.5, 9, 2250, true, 'Gym', 35, 'Good focus block after lunch.', current_timestamp - interval '10 day'),
-  (5, 'demo@gradflow.local', current_date - 9, 7.0, time '00:30', time '07:30', 3, 3, 2.5, 7, 1750, false, '', 0, 'Admin tasks took longer than expected.', current_timestamp - interval '9 day'),
-  (6, 'demo@gradflow.local', current_date - 8, 8.1, time '23:40', time '07:45', 5, 2, 4.0, 10, 2500, true, 'Run', 30, 'Finished experiment setup notes.', current_timestamp - interval '8 day'),
-  (7, 'demo@gradflow.local', current_date - 7, 6.6, time '01:00', time '07:35', 3, 4, 2.0, 6, 1500, false, '', 0, 'Needed more breaks between tasks.', current_timestamp - interval '7 day'),
-  (8, 'demo@gradflow.local', current_date - 6, 7.2, time '00:15', time '07:30', 4, 3, 3.0, 8, 2000, true, 'Walk', 20, 'Advisor feedback was actionable.', current_timestamp - interval '6 day'),
-  (9, 'demo@gradflow.local', current_date - 5, 7.6, time '23:55', time '07:30', 4, 2, 3.5, 9, 2250, true, 'Yoga', 25, 'Cleaned up notes and references.', current_timestamp - interval '5 day'),
-  (10, 'demo@gradflow.local', current_date - 4, 5.9, time '01:35', time '07:30', 2, 5, 1.0, 4, 1000, false, '', 0, 'Deadline pressure; need lighter planning.', current_timestamp - interval '4 day'),
-  (11, 'demo@gradflow.local', current_date - 3, 7.3, time '00:05', time '07:25', 4, 3, 2.5, 8, 2000, true, 'Gym', 40, 'Submitted reading response draft.', current_timestamp - interval '3 day'),
-  (12, 'demo@gradflow.local', current_date - 2, 8.0, time '23:30', time '07:30', 5, 2, 4.5, 10, 2500, true, 'Run', 30, 'Strong deep work session.', current_timestamp - interval '2 day'),
-  (13, 'demo@gradflow.local', current_date - 1, 6.7, time '00:50', time '07:35', 3, 4, 2.0, 7, 1750, false, '', 0, 'Blocked on baseline comparison detail.', current_timestamp - interval '1 day'),
-  (14, 'demo@gradflow.local', current_date, 7.5, time '00:00', time '07:30', 4, 3, 1.5, 8, 2000, true, 'Walk', 20, 'Seed check-in for first launch.', current_timestamp)
-on conflict (id) do nothing;
-
-insert into habit_records (id, user_email, habit_id, record_date, count)
-values
-  (1, 'demo@gradflow.local', 1, current_date - 13, 1), (2, 'demo@gradflow.local', 3, current_date - 13, 1),
-  (3, 'demo@gradflow.local', 1, current_date - 12, 1), (4, 'demo@gradflow.local', 3, current_date - 12, 1), (5, 'demo@gradflow.local', 4, current_date - 12, 1),
-  (6, 'demo@gradflow.local', 1, current_date - 11, 1), (7, 'demo@gradflow.local', 2, current_date - 11, 1),
-  (8, 'demo@gradflow.local', 1, current_date - 10, 1), (9, 'demo@gradflow.local', 2, current_date - 10, 1), (10, 'demo@gradflow.local', 3, current_date - 10, 1),
-  (11, 'demo@gradflow.local', 1, current_date - 9, 1), (12, 'demo@gradflow.local', 4, current_date - 9, 1),
-  (13, 'demo@gradflow.local', 1, current_date - 8, 1), (14, 'demo@gradflow.local', 2, current_date - 8, 1), (15, 'demo@gradflow.local', 3, current_date - 8, 1),
-  (16, 'demo@gradflow.local', 1, current_date - 7, 1),
-  (17, 'demo@gradflow.local', 1, current_date - 6, 1), (18, 'demo@gradflow.local', 2, current_date - 6, 1), (19, 'demo@gradflow.local', 3, current_date - 6, 1),
-  (20, 'demo@gradflow.local', 1, current_date - 5, 1), (21, 'demo@gradflow.local', 2, current_date - 5, 1), (22, 'demo@gradflow.local', 4, current_date - 5, 1),
-  (23, 'demo@gradflow.local', 1, current_date - 4, 1),
-  (24, 'demo@gradflow.local', 1, current_date - 3, 1), (25, 'demo@gradflow.local', 2, current_date - 3, 1), (26, 'demo@gradflow.local', 3, current_date - 3, 1),
-  (27, 'demo@gradflow.local', 1, current_date - 2, 1), (28, 'demo@gradflow.local', 2, current_date - 2, 1), (29, 'demo@gradflow.local', 3, current_date - 2, 1), (30, 'demo@gradflow.local', 4, current_date - 2, 1),
-  (31, 'demo@gradflow.local', 1, current_date - 1, 1), (32, 'demo@gradflow.local', 3, current_date - 1, 1),
-  (33, 'demo@gradflow.local', 1, current_date, 1), (34, 'demo@gradflow.local', 2, current_date, 1)
-on conflict (id) do nothing;
-
-insert into expenses (id, user_email, expense_date, category, type, amount, description)
-values
-  (1, 'demo@gradflow.local', current_date - 13, 'Food', 'EXPENSE', 180, 'Lunch box'),
-  (2, 'demo@gradflow.local', current_date - 12, 'Coffee', 'EXPENSE', 85, 'Cafe study block'),
-  (3, 'demo@gradflow.local', current_date - 11, 'Transport', 'EXPENSE', 40, 'Bus to campus'),
-  (4, 'demo@gradflow.local', current_date - 10, 'Books', 'EXPENSE', 620, 'Research methods book'),
-  (5, 'demo@gradflow.local', current_date - 9, 'Scholarship', 'INCOME', 8000, 'Monthly scholarship'),
-  (6, 'demo@gradflow.local', current_date - 8, 'Food', 'EXPENSE', 210, 'Dinner'),
-  (7, 'demo@gradflow.local', current_date - 7, 'Health', 'EXPENSE', 350, 'Gym day pass'),
-  (8, 'demo@gradflow.local', current_date - 6, 'Coffee', 'EXPENSE', 95, 'Advisor meeting coffee'),
-  (9, 'demo@gradflow.local', current_date - 5, 'Shopping', 'EXPENSE', 480, 'Stationery'),
-  (10, 'demo@gradflow.local', current_date - 4, 'Food', 'EXPENSE', 160, 'Noodles'),
-  (11, 'demo@gradflow.local', current_date - 3, 'Transport', 'EXPENSE', 60, 'MRT'),
-  (12, 'demo@gradflow.local', current_date - 2, 'Part-time', 'INCOME', 2200, 'TA support'),
-  (13, 'demo@gradflow.local', current_date - 1, 'Fun', 'EXPENSE', 300, 'Relax night'),
-  (14, 'demo@gradflow.local', current_date, 'Food', 'EXPENSE', 190, 'Lunch')
-on conflict (id) do nothing;
-
-insert into research_logs (id, user_email, log_date, topic, progress, blockers, next_step, blocker_solved, next_step_solved, hours)
-values
-  (1, 'demo@gradflow.local', current_date - 12, 'Federated learning survey', 'Skimmed three related-work sections.', '', 'Summarize privacy assumptions.', false, false, 2.0),
-  (2, 'demo@gradflow.local', current_date - 10, 'Baseline experiment', 'Prepared dataset split and run notes.', 'Need to confirm metric definition.', 'Ask advisor about evaluation metric.', false, false, 2.5),
-  (3, 'demo@gradflow.local', current_date - 8, 'Experiment setup', 'Finished initial config and command list.', '', 'Run small-scale sanity check.', false, false, 3.0),
-  (4, 'demo@gradflow.local', current_date - 6, 'Advisor feedback', 'Converted feedback into tasks.', '', 'Draft comparison table.', false, false, 1.5),
-  (5, 'demo@gradflow.local', current_date - 4, 'Related work writing', 'Outlined paragraph order.', 'Unsure how to contrast paper B.', 'Write one rough paragraph anyway.', false, false, 1.0),
-  (6, 'demo@gradflow.local', current_date - 2, 'Baseline comparison', 'Ran first comparison pass.', '', 'Collect charts for meeting.', false, false, 2.5),
-  (7, 'demo@gradflow.local', current_date - 1, 'Error analysis', 'Found two suspicious failure cases.', 'Need more examples before conclusion.', 'Inspect 10 more cases.', false, false, 1.5)
-on conflict (id) do nothing;
-
-update research_logs set blocker_solved = false where blocker_solved is null;
-update research_logs set next_step_solved = false where next_step_solved is null;
-
-insert into calendar_events (id, user_email, title, event_date, start_date, end_date, start_time, end_time, category, note)
-values
-  (1, 'demo@gradflow.local', 'Advisor meeting', current_date - 6, current_date - 6, current_date - 6, time '14:00', time '15:00', 'Meeting', 'Discuss experiment direction'),
-  (2, 'demo@gradflow.local', 'Course seminar', current_date - 3, current_date - 3, current_date - 3, time '10:00', time '12:00', 'Course', 'Reading response due'),
-  (3, 'demo@gradflow.local', 'Gym session', current_date - 2, current_date - 2, current_date - 2, time '18:30', time '19:15', 'Health', 'Run and stretch'),
-  (4, 'demo@gradflow.local', 'Research focus block', current_date, current_date, current_date, time '09:30', time '11:30', 'Study', 'Baseline comparison'),
-  (5, 'demo@gradflow.local', 'Budget review', current_date + 2, current_date + 2, current_date + 2, time '20:00', time '20:30', 'Life', 'Check weekly expenses')
-on conflict (id) do nothing;
-
-insert into reward_redemptions (id, user_email, reward_id, redeemed_date, point_cost)
-values
-  (1, 'demo@gradflow.local', 1, current_date - 8, 4),
-  (2, 'demo@gradflow.local', 1, current_date - 3, 4),
-  (3, 'demo@gradflow.local', 2, current_date - 1, 8)
-on conflict (id) do nothing;
-
-select setval(pg_get_serial_sequence('goals', 'id'), greatest((select coalesce(max(id), 1) from goals), 1), true);
-select setval(pg_get_serial_sequence('habits', 'id'), greatest((select coalesce(max(id), 1) from habits), 1), true);
-select setval(pg_get_serial_sequence('reward_items', 'id'), greatest((select coalesce(max(id), 1) from reward_items), 1), true);
-select setval(pg_get_serial_sequence('tasks', 'id'), greatest((select coalesce(max(id), 1) from tasks), 1), true);
-select setval(pg_get_serial_sequence('daily_logs', 'id'), greatest((select coalesce(max(id), 1) from daily_logs), 1), true);
-select setval(pg_get_serial_sequence('habit_records', 'id'), greatest((select coalesce(max(id), 1) from habit_records), 1), true);
-select setval(pg_get_serial_sequence('expenses', 'id'), greatest((select coalesce(max(id), 1) from expenses), 1), true);
-select setval(pg_get_serial_sequence('research_logs', 'id'), greatest((select coalesce(max(id), 1) from research_logs), 1), true);
-select setval(pg_get_serial_sequence('calendar_events', 'id'), greatest((select coalesce(max(id), 1) from calendar_events), 1), true);
-select setval(pg_get_serial_sequence('reward_redemptions', 'id'), greatest((select coalesce(max(id), 1) from reward_redemptions), 1), true);
+on conflict (email) do nothing;

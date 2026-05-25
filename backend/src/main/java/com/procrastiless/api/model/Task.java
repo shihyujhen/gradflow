@@ -1,43 +1,25 @@
 package com.procrastiless.api.model;
 
-import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "tasks")
 public class Task {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = false)
     private String name;
 
     private String userEmail = "demo@gradflow.local";
 
     private String category;
-
-    @Column(nullable = false)
     private int priority;
-
-    @Column(nullable = false)
     private int effort;
 
     private LocalDate deadline;
 
     private Long goalId;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private TaskStatus status = TaskStatus.PENDING;
-
-    @Column(nullable = false)
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
-
-    @PrePersist
     void onCreate() {
         if (createdAt == null) {
             createdAt = LocalDateTime.now();

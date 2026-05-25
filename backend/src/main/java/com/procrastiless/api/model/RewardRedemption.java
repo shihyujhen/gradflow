@@ -1,24 +1,13 @@
 package com.procrastiless.api.model;
 
-import jakarta.persistence.*;
 import java.time.LocalDate;
 
-@Entity
-@Table(name = "reward_redemptions")
 public class RewardRedemption {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String userEmail = "demo@gradflow.local";
-
-    @ManyToOne(optional = false)
     private RewardItem reward;
-
-    @Column(nullable = false)
     private LocalDate redeemedDate;
-
-    @Column(nullable = false)
     private int pointCost;
 
     public Long getId() { return id; }
