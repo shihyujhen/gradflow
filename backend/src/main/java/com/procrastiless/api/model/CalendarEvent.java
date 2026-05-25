@@ -1,22 +1,13 @@
 package com.procrastiless.api.model;
 
-import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-@Entity
-@Table(name = "calendar_events")
 public class CalendarEvent {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String userEmail = "demo@gradflow.local";
-
-    @Column(nullable = false)
     private String title;
-
-    @Column(nullable = false)
     private LocalDate eventDate;
 
     private LocalDate startDate;
@@ -24,8 +15,6 @@ public class CalendarEvent {
     private LocalTime startTime;
     private LocalTime endTime;
     private String category;
-
-    @Column(length = 1000)
     private String note;
 
     public Long getId() { return id; }

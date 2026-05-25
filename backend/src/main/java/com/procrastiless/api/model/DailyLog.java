@@ -1,21 +1,11 @@
 package com.procrastiless.api.model;
 
-import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-@Entity
-@Table(
-        name = "daily_logs",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"user_email", "log_date"})
-)
 public class DailyLog {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = false)
     private LocalDate logDate;
 
     private String userEmail = "demo@gradflow.local";
@@ -31,8 +21,6 @@ public class DailyLog {
     private boolean exercised;
     private String exerciseType;
     private int exerciseMinutes;
-
-    @Column(length = 2000)
     private String note;
 
     private LocalDateTime updatedAt;

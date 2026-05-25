@@ -1,22 +1,13 @@
 package com.procrastiless.api.model;
 
-import jakarta.persistence.*;
 
-@Entity
-@Table(name = "reward_items")
 public class RewardItem {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String userEmail = "demo@gradflow.local";
-
-    @Column(nullable = false)
     private String name;
 
     private String icon;
-
-    @Column(nullable = false)
     private int pointCost;
 
     public Long getId() { return id; }

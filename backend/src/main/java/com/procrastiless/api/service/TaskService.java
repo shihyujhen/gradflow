@@ -4,8 +4,7 @@ import com.procrastiless.api.dto.*;
 import com.procrastiless.api.model.ArchivedTask;
 import com.procrastiless.api.model.Task;
 import com.procrastiless.api.model.TaskStatus;
-import com.procrastiless.api.repository.ArchivedTaskRepository;
-import com.procrastiless.api.repository.TaskRepository;
+import com.procrastiless.api.model.UserDataState;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -16,31 +15,34 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class TaskService {
-    private final TaskRepository taskRepository;
-    private final ArchivedTaskRepository archivedTaskRepository;
+    private final UserDataStore userDataStore;
 
-    public TaskService(TaskRepository taskRepository, ArchivedTaskRepository archivedTaskRepository) {
-        this.taskRepository = taskRepository;
-        this.archivedTaskRepository = archivedTaskRepository;
+    public TaskService(UserDataStore userDataStore) {
+        this.userDataStore = userDataStore;
     }
 
     public List<TaskResponse> listActiveTasks(String userEmail) {
-        return taskRepository.findByUserEmailOrderByIdAsc(userEmail).stream()
+        return userDataStore.load(userEmail).getTasks().stream()
+                .sorted(Comparator.comparing(Task::getId))
                 .map(TaskResponse::from)
                 .toList();
     }
 
     public List<TaskResponse> listArchivedTasks(String userEmail) {
-        return archivedTaskRepository.findByUserEmailOrderByArchivedAtDesc(userEmail).stream()
+        return userDataStore.load(userEmail).getArchivedTasks().stream()
+                .sorted(Comparator.comparing(ArchivedTask::getArchivedAt).reversed())
                 .map(TaskResponse::from)
                 .toList();
     }
 
     public TaskResponse addTask(String userEmail, CreateTaskRequest request) {
+        UserDataState state = userDataStore.load(userEmail);
         Task task = new Task();
+        task.setId(state.nextId("tasks"));
         task.setUserEmail(userEmail);
         task.setName(request.name().trim());
         task.setCategory(request.category());
@@ -50,23 +52,29 @@ public class TaskService {
         task.setGoalId(request.goalId());
         task.setStatus(TaskStatus.PENDING);
         task.setCreatedAt(LocalDateTime.now());
-        return TaskResponse.from(taskRepository.save(task));
+        state.getTasks().add(task);
+        userDataStore.save(userEmail, state);
+        return TaskResponse.from(task);
     }
 
     @Transactional
     public TaskResponse markDone(String userEmail, Long id) {
-        Task task = getTask(userEmail, id);
+        UserDataState state = userDataStore.load(userEmail);
+        Task task = getTask(state, id);
         task.setStatus(TaskStatus.DONE);
         task.setUpdatedAt(LocalDateTime.now());
+        userDataStore.save(userEmail, state);
         return TaskResponse.from(task);
     }
 
     @Transactional
     public void deleteTask(String userEmail, Long id) {
-        if (!taskRepository.existsByIdAndUserEmail(id, userEmail)) {
+        UserDataState state = userDataStore.load(userEmail);
+        boolean removed = state.getTasks().removeIf(task -> Objects.equals(task.getId(), id));
+        if (!removed) {
             throw new IllegalArgumentException("Task id not found.");
         }
-        taskRepository.deleteByIdAndUserEmail(id, userEmail);
+        userDataStore.save(userEmail, state);
     }
 
     @Transactional
@@ -75,13 +83,15 @@ public class TaskService {
             throw new IllegalArgumentException("Days must not be 0.");
         }
 
-        Task task = getTask(userEmail, id);
+        UserDataState state = userDataStore.load(userEmail);
+        Task task = getTask(state, id);
         if (task.getDeadline() == null) {
             throw new IllegalArgumentException("Task has no deadline to postpone.");
         }
 
         task.setDeadline(task.getDeadline().plusDays(days));
         task.setUpdatedAt(LocalDateTime.now());
+        userDataStore.save(userEmail, state);
         return TaskResponse.from(task);
     }
 
@@ -90,7 +100,8 @@ public class TaskService {
             throw new IllegalArgumentException("Top must be greater than 0.");
         }
 
-        return taskRepository.findByUserEmailAndStatus(userEmail, TaskStatus.PENDING).stream()
+        return userDataStore.load(userEmail).getTasks().stream()
+                .filter(task -> task.getStatus() == TaskStatus.PENDING)
                 .sorted(suggestionComparator())
                 .limit(top)
                 .map(this::toSuggestion)
@@ -99,7 +110,10 @@ public class TaskService {
 
     @Transactional
     public ArchiveResponse archiveCompletedTasks(String userEmail) {
-        List<Task> doneTasks = taskRepository.findByUserEmailAndStatus(userEmail, TaskStatus.DONE);
+        UserDataState state = userDataStore.load(userEmail);
+        List<Task> doneTasks = state.getTasks().stream()
+                .filter(task -> task.getStatus() == TaskStatus.DONE)
+                .toList();
         if (doneTasks.isEmpty()) {
             return new ArchiveResponse(0, "No completed tasks to archive.");
         }
@@ -109,18 +123,21 @@ public class TaskService {
                 .map(task -> ArchivedTask.from(task, archivedAt))
                 .toList();
 
-        archivedTaskRepository.saveAll(archivedTasks);
-        taskRepository.deleteAll(doneTasks);
+        state.getArchivedTasks().addAll(archivedTasks);
+        state.getTasks().removeIf(task -> task.getStatus() == TaskStatus.DONE);
+        userDataStore.save(userEmail, state);
         return new ArchiveResponse(doneTasks.size(), "Archived " + doneTasks.size() + " tasks.");
     }
 
     @Transactional
     public void resetActiveTasks(String userEmail) {
-        taskRepository.deleteByUserEmail(userEmail);
+        UserDataState state = userDataStore.load(userEmail);
+        state.getTasks().clear();
+        userDataStore.save(userEmail, state);
     }
 
     public StatsResponse stats(String userEmail) {
-        List<Task> tasks = taskRepository.findByUserEmailOrderByIdAsc(userEmail);
+        List<Task> tasks = userDataStore.load(userEmail).getTasks();
         long total = tasks.size();
         long pending = tasks.stream().filter(task -> task.getStatus() == TaskStatus.PENDING).count();
         long done = tasks.stream().filter(task -> task.getStatus() == TaskStatus.DONE).count();
@@ -143,8 +160,10 @@ public class TaskService {
         );
     }
 
-    private Task getTask(String userEmail, Long id) {
-        return taskRepository.findByIdAndUserEmail(id, userEmail)
+    private Task getTask(UserDataState state, Long id) {
+        return state.getTasks().stream()
+                .filter(task -> Objects.equals(task.getId(), id))
+                .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Task id not found."));
     }
 

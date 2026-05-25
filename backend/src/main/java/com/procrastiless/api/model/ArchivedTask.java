@@ -1,42 +1,25 @@
 package com.procrastiless.api.model;
 
-import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "archived_tasks")
 public class ArchivedTask {
-    @Id
     private Long id;
-
-    @Column(nullable = false)
     private String name;
 
     private String userEmail = "demo@gradflow.local";
 
     private String category;
-
-    @Column(nullable = false)
     private int priority;
-
-    @Column(nullable = false)
     private int effort;
 
     private LocalDate deadline;
 
     private Long goalId;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private TaskStatus status;
-
-    @Column(nullable = false)
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
-
-    @Column(nullable = false)
     private LocalDateTime archivedAt;
 
     public static ArchivedTask from(Task task, LocalDateTime archivedAt) {

@@ -1,27 +1,16 @@
 package com.procrastiless.api.model;
 
-import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@Entity
-@Table(name = "expenses")
 public class Expense {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = false)
     private LocalDate expenseDate;
 
     private String userEmail = "demo@gradflow.local";
-
-    @Column(nullable = false)
     private String category;
 
     private String type = "EXPENSE";
-
-    @Column(nullable = false)
     private BigDecimal amount;
 
     private String description;
