@@ -86,7 +86,7 @@ public class GradFlowService {
         habit.setName(request.name().trim());
         habit.setTargetCount(request.targetCount());
         habit.setUnit(request.unit());
-        habit.setIcon(request.icon() == null || request.icon().isBlank() ? "*" : request.icon());
+        habit.setIcon(request.icon() == null || request.icon().isBlank() ? "\u2728" : request.icon());
         habit.setGoalId(request.goalId());
         state.getHabits().add(habit);
         userDataStore.save(userEmail, state);
@@ -205,7 +205,7 @@ public class GradFlowService {
         reward.setId(state.nextId("rewardItems"));
         reward.setUserEmail(userEmail);
         reward.setName(request.name().trim());
-        reward.setIcon(request.icon() == null || request.icon().isBlank() ? "*" : request.icon());
+        reward.setIcon(request.icon() == null || request.icon().isBlank() ? "\u2728" : request.icon());
         reward.setPointCost(request.pointCost());
         state.getRewardItems().add(reward);
         userDataStore.save(userEmail, state);
