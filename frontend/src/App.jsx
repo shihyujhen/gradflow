@@ -319,25 +319,6 @@ function readAuthSession() {
   }
 }
 
-function readAuthAccounts() {
-  const demoAccount = {
-    email: 'demo@gradflow.local',
-    password: 'demo1234',
-    createdAt: 'seed',
-  };
-  try {
-    const accounts = JSON.parse(localStorage.getItem('gradflow.authAccounts') ?? '[]');
-    if (accounts.some((account) => account.email === demoAccount.email)) {
-      return accounts;
-    }
-    const nextAccounts = [demoAccount, ...accounts];
-    localStorage.setItem('gradflow.authAccounts', JSON.stringify(nextAccounts));
-    return nextAccounts;
-  } catch {
-    return [demoAccount];
-  }
-}
-
 function App() {
   const [authSession, setAuthSession] = useState(readAuthSession);
   const [activePage, setActivePage] = useState('overview');
@@ -765,35 +746,35 @@ function AuthPage({ onAuth }) {
   const [mode, setMode] = useState('login');
   const [form, setForm] = useState({ email: '', password: '', confirm: '' });
   const [authError, setAuthError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
-  function submitAuth(event) {
+  async function submitAuth(event) {
     event.preventDefault();
     const email = form.email.trim().toLowerCase();
     if (!email || !form.password) {
       setAuthError('Please enter email and password.');
       return;
     }
-    const accounts = readAuthAccounts();
+    setSubmitting(true);
+    setAuthError('');
     if (mode === 'register') {
       if (form.password !== form.confirm) {
         setAuthError('Password confirmation does not match.');
+        setSubmitting(false);
         return;
       }
-      if (accounts.some((account) => account.email === email)) {
-        setAuthError('This email is already registered.');
-        return;
-      }
-      const nextAccounts = [...accounts, { email, password: form.password, createdAt: new Date().toISOString() }];
-      localStorage.setItem('gradflow.authAccounts', JSON.stringify(nextAccounts));
-      onAuth({ mode: 'account', email });
-      return;
     }
-    const account = accounts.find((item) => item.email === email && item.password === form.password);
-    if (!account) {
-      setAuthError('Email or password is incorrect.');
-      return;
+    try {
+      const account =
+        mode === 'register'
+          ? await api.auth.register({ email, password: form.password })
+          : await api.auth.login({ email, password: form.password });
+      onAuth({ mode: 'account', email: account.email });
+    } catch (err) {
+      setAuthError(err.message);
+    } finally {
+      setSubmitting(false);
     }
-    onAuth({ mode: 'account', email });
   }
 
   return (
@@ -821,9 +802,9 @@ function AuthPage({ onAuth }) {
             />
           )}
           {authError && <div className="notice error">{authError}</div>}
-          <button className="primary-button">
+          <button className="primary-button" disabled={submitting}>
             <Check size={16} />
-            {mode === 'login' ? 'Sign in' : 'Register'}
+            {submitting ? 'Please wait...' : mode === 'login' ? 'Sign in' : 'Register'}
           </button>
         </form>
         <div className="auth-actions">
@@ -2946,10 +2927,25 @@ function SettingsPage({ profileSettings, setProfileSettings, setMessage, onClose
   const [draftProfile, setDraftProfile] = useState(profileSettings);
   const [avatarEditorOpen, setAvatarEditorOpen] = useState(false);
 
-  function saveSettings() {
+  async function saveSettings() {
     if (passwordForm.next && passwordForm.next !== passwordForm.confirm) {
       setMessage('Password confirmation does not match.');
       return;
+    }
+    if (passwordForm.next && !passwordForm.current) {
+      setMessage('Current password is required.');
+      return;
+    }
+    if (passwordForm.next && authSession?.mode !== 'guest') {
+      try {
+        await api.auth.changePassword({
+          currentPassword: passwordForm.current,
+          newPassword: passwordForm.next,
+        });
+      } catch (err) {
+        setMessage(err.message);
+        return;
+      }
     }
     const nextProfile = {
       ...draftProfile,
@@ -2958,12 +2954,6 @@ function SettingsPage({ profileSettings, setProfileSettings, setMessage, onClose
     setProfileSettings(nextProfile);
     if (authSession?.mode !== 'guest') {
       localStorage.setItem('gradflow.profileSettings', JSON.stringify(nextProfile));
-      if (passwordForm.next) {
-        const accounts = readAuthAccounts().map((account) =>
-          account.email === authSession.email ? { ...account, password: passwordForm.next } : account,
-        );
-        localStorage.setItem('gradflow.authAccounts', JSON.stringify(accounts));
-      }
     }
     setPasswordForm({ current: '', next: '', confirm: '' });
     setMessage('Settings saved.');

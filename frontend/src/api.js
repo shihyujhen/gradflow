@@ -275,6 +275,11 @@ export const api = {
   setCurrentUser: (email) => {
     currentUserEmail = email || 'demo@gradflow.local';
   },
+  auth: {
+    login: (credentials) => request('/auth/login', { method: 'POST', body: JSON.stringify(credentials) }),
+    register: (credentials) => request('/auth/register', { method: 'POST', body: JSON.stringify(credentials) }),
+    changePassword: (payload) => request('/auth/password', { method: 'PATCH', body: JSON.stringify(payload) }),
+  },
   listTasks: () => request('/tasks'),
   listArchived: () => request('/tasks?archived=true'),
   createTask: (task) => request('/tasks', { method: 'POST', body: JSON.stringify(task) }),
