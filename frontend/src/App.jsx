@@ -2959,7 +2959,20 @@ function SettingsPage({ profileSettings, setProfileSettings, setMessage, onClose
     setMessage('Settings saved.');
     onClose();
   }
-
+  async function sendReminder() {
+    try {
+      setMessage('提醒寄送中...');
+      const response = await fetch(
+        'https://ayfewyrj6dnzxpo3mco2piqpqi0ekgfe.lambda-url.ap-northeast-1.on.aws/',
+        { method: 'POST' },
+      );
+      if (!response.ok) throw new Error('寄送失敗');
+      const data = await response.json();
+      setMessage(data.message || '提醒已寄出，請查看信箱。');
+    } catch (err) {
+      setMessage('提醒寄送失敗：' + err.message);
+    }
+  }
   function downloadReport() {
     const completedTasks = reportData.tasks.filter((task) => task.status === 'DONE').length;
     const totalExpense = reportData.expenses
@@ -3053,6 +3066,9 @@ function SettingsPage({ profileSettings, setProfileSettings, setMessage, onClose
             </button>
             <button type="button" className="secondary-button" onClick={downloadReport}>
               Download Health Report
+            </button>
+            <button type="button" className="secondary-button" onClick={sendReminder}>
+              寄送今日提醒到信箱
             </button>
           </section>
           <section className="settings-panel">
