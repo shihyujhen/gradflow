@@ -48,8 +48,9 @@ public class GradFlowController {
     }
 
     @GetMapping("/habits")
-    public List<HabitSummary> listHabits(@RequestHeader(value = "X-User-Email", defaultValue = "demo@gradflow.local") String email) {
-        return gradFlowService.habitSummaries(userEmail(email));
+    public List<HabitSummary> listHabits(@RequestHeader(value = "X-User-Email", defaultValue = "demo@gradflow.local") String email,
+                                         @RequestParam(required = false) LocalDate date) {
+        return gradFlowService.habitSummaries(userEmail(email), date);
     }
 
     @GetMapping("/habits/{id}/stats")

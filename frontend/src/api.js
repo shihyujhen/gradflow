@@ -128,10 +128,11 @@ async function guestRequest(path, options = {}) {
     return jsonResponse(null);
   }
 
-  if (path === '/gradflow/habits' && method === 'GET') {
+  if ((path === '/gradflow/habits' || path.startsWith('/gradflow/habits?')) && method === 'GET') {
+    const date = path.includes('?') ? new URLSearchParams(path.split('?')[1]).get('date') : todayKey();
     return jsonResponse(guestDb.habits.map((habit) => ({
       ...habit,
-      todayCount: guestDb.habitRecords.find((record) => record.habitId === habit.id && record.recordDate === todayKey())?.count ?? 0,
+      todayCount: guestDb.habitRecords.find((record) => record.habitId === habit.id && record.recordDate === date)?.count ?? 0,
       weeklyRate: 0,
     })));
   }
@@ -298,7 +299,7 @@ export const api = {
     dailyLogs: () => request('/gradflow/daily-logs'),
     saveDailyLog: (log) => request('/gradflow/daily-logs', { method: 'POST', body: JSON.stringify(log) }),
     deleteDailyLog: (id) => request(`/gradflow/daily-logs/${id}`, { method: 'DELETE' }),
-    habits: () => request('/gradflow/habits'),
+    habits: (date) => request(`/gradflow/habits${date ? `?date=${date}` : ''}`),
     habitStats: (id) => request(`/gradflow/habits/${id}/stats`),
     createHabit: (habit) => request('/gradflow/habits', { method: 'POST', body: JSON.stringify(habit) }),
     deleteHabit: (id) => request(`/gradflow/habits/${id}`, { method: 'DELETE' }),
