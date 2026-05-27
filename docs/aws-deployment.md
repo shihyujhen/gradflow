@@ -7,6 +7,10 @@ This document explains how to deploy GradFlow from scratch on AWS using:
 * Nginx reverse proxy
 * PostgreSQL
 * AWS S3
+* Amazon RDS PostgreSQL
+* AWS Lambda
+* Amazon Bedrock
+* Amazon SES
 * AWS IAM
 
 The guide focuses on a practical single-EC2 deployment architecture suitable for learning, cloud practice, and further development.
@@ -28,6 +32,12 @@ Backend --> PostgreSQL[(PostgreSQL)]
 
 Backend --> S3[(AWS S3)]
 
+Frontend --> Lambda[AWS Lambda Reminder Function]
+
+Lambda --> Bedrock[Amazon Bedrock]
+
+Lambda --> SES[Amazon SES]
+
 GitHub --> EC2[AWS EC2 Instance]
 ```
 
@@ -43,7 +53,7 @@ Before deployment, prepare:
 * SSH key pair (`.pem`)
 * Docker & Docker Compose
 * AWS S3 bucket
-* AWS IAM role for EC2
+* AWS IAM role for EC2 S3 access
 
 ---
 
@@ -223,7 +233,7 @@ inside Docker networking.
 
 ---
 
-# AWS IAM Role Setup
+# AWS IAM Role Setup for S3
 
 Create an IAM role for EC2 with:
 
@@ -236,6 +246,8 @@ AmazonS3FullAccess
 Attach the IAM role to the EC2 instance.
 
 This allows the backend to upload files to S3 without storing AWS access keys inside the repository.
+
+This IAM role is for server-to-AWS access. GradFlow user login is handled by the application itself through `auth_accounts`, password salts, and password hashes.
 
 ---
 
@@ -396,8 +408,12 @@ Current implemented AWS integrations:
 * EC2 deployment
 * Dockerized multi-container architecture
 * Nginx reverse proxy
+* Amazon RDS PostgreSQL
 * S3 avatar upload
-* IAM role-based authentication
+* Lambda reminder endpoint
+* Bedrock-assisted reminder content
+* SES email delivery
+* IAM role-based S3 access from EC2/backend
 
 ---
 
@@ -405,7 +421,6 @@ Current implemented AWS integrations:
 
 Recommended next AWS upgrades:
 
-* Amazon RDS PostgreSQL
 * GitHub Actions CI/CD
 * CloudWatch logging
 * Application Load Balancer (ALB)
