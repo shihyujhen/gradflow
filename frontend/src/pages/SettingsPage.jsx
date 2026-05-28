@@ -55,6 +55,7 @@ import {
   themeOptions,
   today,
   uniqueList,
+  writeProfileSettings,
 } from '../appData.jsx';
 import { api } from '../api.js';
 import { Input } from '../components/common.jsx';
@@ -90,9 +91,7 @@ function SettingsPage({ profileSettings, setProfileSettings, setMessage, onClose
       passwordUpdatedAt: passwordForm.next ? new Date().toISOString() : profileSettings.passwordUpdatedAt,
     };
     setProfileSettings(nextProfile);
-    if (authSession?.mode !== 'guest') {
-      localStorage.setItem('gradflow.profileSettings', JSON.stringify(nextProfile));
-    }
+    writeProfileSettings(authSession, nextProfile);
     setPasswordForm({ current: '', next: '', confirm: '' });
     setMessage('Settings saved.');
     onClose();

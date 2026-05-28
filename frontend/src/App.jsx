@@ -17,6 +17,7 @@ import {
   readProfileSettings,
   readTodaySettings,
   uniqueList,
+  writeProfileSettings,
 } from './appData.jsx';
 import {
   AuthPage,
@@ -58,7 +59,7 @@ function App() {
 
   const [taskForm, setTaskForm] = useState(emptyTask);
   const [todaySettings, setTodaySettings] = useState(readTodaySettings);
-  const [profileSettings, setProfileSettings] = useState(readProfileSettings);
+  const [profileSettings, setProfileSettings] = useState(() => readProfileSettings(readAuthSession()));
   const [dailyForm, setDailyForm] = useState(() => ({
     ...emptyDaily,
     waterMl: Number(readTodaySettings().defaultWaterMl),
@@ -191,19 +192,26 @@ function App() {
     setAuthSession(session);
     if (session.mode !== 'guest') {
       localStorage.setItem('gradflow.authSession', JSON.stringify(session));
-      setProfileSettings((settings) => ({
-        ...settings,
+      const loaded = readProfileSettings(session);
+      const nextProfile = {
+        ...loaded,
         displayName:
-          settings.displayName === 'Graduate Student' ? session.email.split('@')[0] || settings.displayName : settings.displayName,
-      }));
+          loaded.displayName && loaded.displayName !== 'Graduate Student'
+            ? loaded.displayName
+            : session.email.split('@')[0] || loaded.displayName,
+      };
+      setProfileSettings(nextProfile);
+      writeProfileSettings(session, nextProfile);
     } else {
       localStorage.removeItem('gradflow.authSession');
+      setProfileSettings(readProfileSettings(session));
     }
   }
 
   function logout() {
     localStorage.removeItem('gradflow.authSession');
     setAuthSession(null);
+    setProfileSettings(readProfileSettings(null));
   }
 
   async function submitDaily(event) {

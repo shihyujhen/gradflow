@@ -277,18 +277,35 @@ export function readTodaySettings() {
   }
 }
 
-export function readProfileSettings() {
+export const defaultProfileSettings = {
+  displayName: 'Graduate Student',
+  avatar: '',
+  darkMode: false,
+  theme: 'green',
+  passwordUpdatedAt: '',
+};
+
+function profileStorageKey(session) {
+  if (session && session.mode !== 'guest' && session.email) {
+    return `gradflow.profileSettings.${session.email}`;
+  }
+  return null;
+}
+
+export function readProfileSettings(session) {
+  const key = profileStorageKey(session);
+  if (!key) return { ...defaultProfileSettings };
   try {
-    return {
-      displayName: 'Graduate Student',
-      avatar: '',
-      darkMode: false,
-      theme: 'green',
-      passwordUpdatedAt: '',
-      ...JSON.parse(localStorage.getItem('gradflow.profileSettings') ?? '{}'),
-    };
+    return { ...defaultProfileSettings, ...JSON.parse(localStorage.getItem(key) ?? '{}') };
   } catch {
-    return { displayName: 'Graduate Student', avatar: '', darkMode: false, theme: 'green', passwordUpdatedAt: '' };
+    return { ...defaultProfileSettings };
+  }
+}
+
+export function writeProfileSettings(session, profile) {
+  const key = profileStorageKey(session);
+  if (key) {
+    localStorage.setItem(key, JSON.stringify(profile));
   }
 }
 
