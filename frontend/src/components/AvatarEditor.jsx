@@ -69,10 +69,16 @@ function AvatarEditor({ profileSettings, setProfileSettings, setMessage, onClose
 
   function updateAvatar(event) {
     const file = event.target.files?.[0];
+    event.target.value = '';
     if (!file) return;
     const reader = new FileReader();
     reader.onload = () => setAvatarDraft(reader.result);
     reader.readAsDataURL(file);
+  }
+
+  function openFilePicker() {
+    if (fileInputRef.current) fileInputRef.current.value = '';
+    fileInputRef.current?.click();
   }
 
   function saveAvatar() {
@@ -153,7 +159,7 @@ function AvatarEditor({ profileSettings, setProfileSettings, setMessage, onClose
             Close
           </button>
         </div>
-        <button type="button" className="profile-avatar-preview avatar-click-target" onClick={() => fileInputRef.current?.click()}>
+        <button type="button" className="profile-avatar-preview avatar-click-target" onClick={openFilePicker}>
           {avatarDraft ? (
             <img
               src={avatarDraft}
