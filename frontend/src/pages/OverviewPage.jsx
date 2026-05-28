@@ -247,7 +247,7 @@ function AiLogAssistant({ dailyLogs, habits, run }) {
         habits: habits.map((habit) => ({ id: habit.id, name: habit.name, targetCount: habit.targetCount })),
       });
       if (result.status === 'clarify') {
-        setQuestion(result.question || 'Can you add one more detail?');
+        setQuestion(result.question || '可以再補充一個細節嗎？');
       } else {
         setDraft(result);
       }
@@ -298,7 +298,7 @@ function AiLogAssistant({ dailyLogs, habits, run }) {
 
   function describeDraft() {
     const actions = draft?.actions ?? [];
-    if (!actions.length) return draft?.summary || 'I found the note, but there is nothing to update yet.';
+    if (!actions.length) return draft?.summary || '我看懂了這則筆記，但目前沒有可以更新的內容。';
     const lines = actions.map((action) => {
       if (action.type === 'dailyLog') {
         const fields = Object.keys(action.fields ?? {});

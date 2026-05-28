@@ -38,16 +38,18 @@ public class GeminiLogParserService {
 
         String prompt = """
                 You convert a student life note into GradFlow update actions.
-                Return JSON only.
+                Return JSON only. The JSON keys must stay in English, but every human-readable value you write (the "summary" and "question" text) MUST be written in Traditional Chinese (繁體中文).
                 Confirm schema:
-                {"status":"confirm","summary":"short confirmation","actions":[{"type":"dailyLog","date":"YYYY-MM-DD","fields":{}}]}
+                {"status":"confirm","summary":"用繁體中文寫的簡短確認","actions":[{"type":"dailyLog","date":"YYYY-MM-DD","fields":{}}]}
                 Clarify schema:
-                {"status":"clarify","question":"one concise follow-up question","actions":[]}
+                {"status":"clarify","question":"用繁體中文寫的一句追問","actions":[]}
                 Allowed dailyLog fields: sleepStart, wakeTime, sleepHours, mood, stress, studyHours, waterMl, exercised, exerciseType, exerciseMinutes, note.
                 Allowed habit action: {"type":"habitRecord","habitName":"name","date":"YYYY-MM-DD","count":1}.
                 Today is %s.
                 Existing habits: %s.
-                If the note is ambiguous, ask one follow-up question instead of guessing.
+                Only create an action when an item in the note maps to an allowed dailyLog field or to one of the existing habits listed above; these are the only available categories.
+                If part of the note does not relate to any allowed dailyLog field or existing habit, do NOT invent an action and do NOT force it into an unrelated field. Instead, in the Traditional Chinese summary, clearly state that you cannot add that item because there is no related category (例如：「無法新增『買新電腦』：找不到相關的類別」)。Still create actions for the parts that you can map.
+                If the note is ambiguous, ask one follow-up question in Traditional Chinese instead of guessing.
                 User note: %s
                 """.formatted(request.today(), request.habits(), request.text());
 
