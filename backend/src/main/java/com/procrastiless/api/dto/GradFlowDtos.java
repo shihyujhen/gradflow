@@ -103,4 +103,6 @@ public class GradFlowDtos {
     public record AiHabitContext(Long id, String name, int targetCount) {}
     public record AiLogParseRequest(String text, LocalDate today, List<AiHabitContext> habits) {}
     public record AiLogParseResponse(String status, String summary, String question, List<Map<String, Object>> actions) {}
+
+    public record ReminderResponse(boolean sent, String recipient, String message) {}
 }

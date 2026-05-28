@@ -326,5 +326,6 @@ export const api = {
     deleteCalendarEvent: (id) => request(`/gradflow/calendar-events/${id}`, { method: 'DELETE' }),
     analytics: () => request('/gradflow/analytics'),
     parseLog: (payload) => request('/gradflow/ai/parse-log', { method: 'POST', body: JSON.stringify(payload) }),
+    sendReminder: () => request('/gradflow/reminder', { method: 'POST' }),
   },
 };

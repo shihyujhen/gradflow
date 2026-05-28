@@ -97,15 +97,18 @@ function SettingsPage({ profileSettings, setProfileSettings, setMessage, onClose
     onClose();
   }
   async function sendReminder() {
+    if (authSession?.mode === 'guest') {
+      setMessage('Sign in with an account to receive email reminders.');
+      return;
+    }
     try {
       setMessage('提醒寄送中...');
-      const response = await fetch(
-        'https://ayfewyrj6dnzxpo3mco2piqpqi0ekgfe.lambda-url.ap-northeast-1.on.aws/',
-        { method: 'POST' },
-      );
-      if (!response.ok) throw new Error('寄送失敗');
-      const data = await response.json();
-      setMessage(data.message || '提醒已寄出，請查看信箱。');
+      const data = await api.gradflow.sendReminder();
+      if (data?.sent) {
+        setMessage(data.message || '提醒已寄出，請查看信箱。');
+      } else {
+        setMessage('提醒寄送失敗：' + (data?.message || '未知錯誤'));
+      }
     } catch (err) {
       setMessage('提醒寄送失敗：' + err.message);
     }
