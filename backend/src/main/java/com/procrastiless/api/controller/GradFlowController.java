@@ -10,6 +10,7 @@ import com.procrastiless.api.dto.GradFlowDtos.*;
 import com.procrastiless.api.model.*;
 import com.procrastiless.api.service.GeminiLogParserService;
 import com.procrastiless.api.service.GradFlowService;
+import com.procrastiless.api.service.ReminderService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,11 +24,13 @@ public class GradFlowController {
     private final S3Service s3Service;
     private final GradFlowService gradFlowService;
     private final GeminiLogParserService geminiLogParserService;
+    private final ReminderService reminderService;
 
-    public GradFlowController(GradFlowService gradFlowService, GeminiLogParserService geminiLogParserService, S3Service s3Service) {
+    public GradFlowController(GradFlowService gradFlowService, GeminiLogParserService geminiLogParserService, S3Service s3Service, ReminderService reminderService) {
         this.gradFlowService = gradFlowService;
         this.geminiLogParserService = geminiLogParserService;
 	this.s3Service = s3Service;
+        this.reminderService = reminderService;
     }
 
     @GetMapping("/daily-logs")
@@ -48,8 +51,9 @@ public class GradFlowController {
     }
 
     @GetMapping("/habits")
-    public List<HabitSummary> listHabits(@RequestHeader(value = "X-User-Email", defaultValue = "demo@gradflow.local") String email) {
-        return gradFlowService.habitSummaries(userEmail(email));
+    public List<HabitSummary> listHabits(@RequestHeader(value = "X-User-Email", defaultValue = "demo@gradflow.local") String email,
+                                         @RequestParam(required = false) LocalDate date) {
+        return gradFlowService.habitSummaries(userEmail(email), date);
     }
 
     @GetMapping("/habits/{id}/stats")
@@ -195,6 +199,11 @@ public class GradFlowController {
             throws IOException {
 
         return s3Service.uploadFile(file);
+    }
+
+    @PostMapping("/reminder")
+    public ReminderResponse sendReminder(@RequestHeader(value = "X-User-Email", defaultValue = "demo@gradflow.local") String email) {
+        return reminderService.sendDailyReminder(userEmail(email));
     }
 
     private String userEmail(String email) {

@@ -102,8 +102,12 @@ public class GradFlowService {
     }
 
     public List<HabitSummary> habitSummaries(String userEmail) {
+        return habitSummaries(userEmail, LocalDate.now());
+    }
+
+    public List<HabitSummary> habitSummaries(String userEmail, LocalDate selectedDate) {
         UserDataState state = userDataStore.load(userEmail);
-        LocalDate today = LocalDate.now();
+        LocalDate habitDate = selectedDate == null ? LocalDate.now() : selectedDate;
         LocalDate weekStart = weekStart();
         LocalDate weekEnd = weekEnd();
         List<HabitRecord> weeklyRecords = state.getHabitRecords().stream()
@@ -115,7 +119,7 @@ public class GradFlowService {
                 .map(habit -> {
                     int todayCount = state.getHabitRecords().stream()
                             .filter(record -> Objects.equals(record.getHabit().getId(), habit.getId()))
-                            .filter(record -> Objects.equals(record.getRecordDate(), today))
+                            .filter(record -> Objects.equals(record.getRecordDate(), habitDate))
                             .map(HabitRecord::getCount)
                             .findFirst()
                             .orElse(0);

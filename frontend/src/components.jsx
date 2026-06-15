@@ -1,0 +1,12 @@
+export { AuthPage } from './pages/AuthPage.jsx';
+export { Overview } from './pages/OverviewPage.jsx';
+export { TodayPage } from './pages/TodayPage.jsx';
+export { TasksPage } from './pages/TasksPage.jsx';
+export { ResearchPage } from './pages/ResearchPage.jsx';
+export { HabitsPage } from './pages/HabitsPage.jsx';
+export { RewardsPage } from './pages/RewardsPage.jsx';
+export { FinancePage } from './pages/FinancePage.jsx';
+export { GoalsPage } from './pages/GoalsPage.jsx';
+export { CalendarPage } from './pages/CalendarPage.jsx';
+export { SettingsPage } from './pages/SettingsPage.jsx';
+export { ConfirmDialog } from './components/common.jsx';
